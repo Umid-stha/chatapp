@@ -14,7 +14,7 @@
 
         <div class="tab-content" id="myTabContent">
 
-          <div class="tab-pane fade show active" id="signup" role="tabpanel" aria-labelledby="signin-tab">
+          <div class="tab-pane fade show active" id="signup" role="tabpanel" aria-labelledby="signup-tab">
             <form @submit="signUp">
               <div class="form-group">
                 <input v-model="email" type="email" class="form-control" id="email" placeholder="Email Address" required>
@@ -59,6 +59,12 @@
 
 <script>
   const $ = window.jQuery // JQuery
+  $(function () {
+    $('#signup-tab, #signin-tab').on('click', function (e) {
+      e.preventDefault();
+      $(this).tab('show');
+    });
+  });
 
   export default {
 
@@ -70,19 +76,31 @@
 
     methods: {
         signUp () {
-            $.post('http://localhost:8000/auth/users/create/', this.$data, (data) => {
-            alert("Your account has been created. You will be signed in automatically")
-            this.signIn()
-            })
-            .fail((response) => {
-            alert(response.responseText)
-            })
+          $.ajax({
+            url: 'http://localhost:8000/auth/users/',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+              "email": this.email,
+              "username": this.username,
+              "password": this.password
+            }),
+            success: (data) => {
+              console.log(data);
+              alert("Your account has been created. You will be signed in automatically");
+              this.signIn();
+            },
+            error: (response) => {
+              console.log(this.$data);
+              alert(response.responseText);
+            }
+          });
         },
 
         signIn () {
-            const credentials = {username: this.username, password: this.password}
+            const credentials = {"username": this.username, "password": this.password}
 
-            $.post('http://localhost:8000/auth/token/create/', credentials, (data) => {
+            $.post('http://localhost:8000/auth/token/login/', credentials, (data) => {
             sessionStorage.setItem('authToken', data.auth_token)
             sessionStorage.setItem('username', this.username)
             this.$router.push('/chats')

@@ -17,6 +17,11 @@ const router = new Router({
       path:'/auth',
       name: 'Auth',
       component: Auth
+    },
+    {
+      path:'/chats/:uri?',
+      name: 'Chat',
+      component: Chat
     }
   ]
 })
